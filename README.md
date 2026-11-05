@@ -28,11 +28,11 @@ The project-scoped Claude Code installation was tested on 5 November 2026 using 
 
 ### Claude web or desktop: upload the ZIP
 
-1. Open [release v1.0.0](https://github.com/heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol/releases/tag/v1.0.0) and download **aiops.zip** from Assets.
+1. Open [release v1.0.1](https://github.com/heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol/releases/tag/v1.0.1) and download **aiops.zip** from Assets.
 2. In Claude, open **Customize → Skills**, choose **+ → Create skill → Upload a skill**, and upload the ZIP.
 3. Enable the skill. Availability depends on your account and organization settings.
 
-The ZIP contains only `aiops/SKILL.md`. Use this asset rather than GitHub's automatically generated source-code archives.
+The ZIP contains `aiops/SKILL.md` and `aiops/LICENSE`. Use this asset rather than GitHub's automatically generated source-code archives.
 
 ### Other tools: manual installation
 
@@ -48,7 +48,7 @@ Expected behavior: the assistant presents an AIOPS recommendation and asks for a
 
 ### Versions and updates
 
-Use the versioned ZIP when you need the exact v1.0.0 skill. The repository install command follows the repository's current source. Review changes before updating. Installation never grants approval for future tasks.
+Use the versioned ZIP when you need the exact v1.0.1 package. The repository install command follows the repository's current source. Review changes before updating. Installation never grants approval for future tasks.
 
 ## Get started
 
@@ -116,4 +116,8 @@ Use GitHub issues to suggest improvements and pull requests to propose focused c
 
 ## License
 
-No license has been selected. Public visibility alone does not grant an open-source license.
+Copyright © 2026 Hesham Hammam. All rights reserved except as granted in the [AIOPS Limited Use License](LICENSE).
+
+Installation, personal use, and internal business use are permitted under its terms. Redistribution, resale, and public hosting of the Materials or modified versions require separate written permission, except as permitted by the license, applicable law, or GitHub’s Terms of Service. Public GitHub forks remain permitted under those terms.
+
+This is a custom limited-use license, not an open-source license. A copy is included in the skill folder and the v1.0.1 ZIP. It has not been independently reviewed by legal counsel. The earlier v1.0.0 release is retained unchanged; its ZIP does not contain this license.
