@@ -6,49 +6,135 @@ AIOPS is a reusable twelve-stage workflow for AI-assisted product, business, and
 
 Created by [Hesham Hammam](https://github.com/heshamhammam1).
 
-## Install AIOPS
+## Install and use AIOPS
 
-### Coding agents: one command
+| Platform | Method | Scope |
+| --- | --- | --- |
+| Claude Code | Skills CLI or manual skill folder | Project or personal |
+| Claude web / desktop | Upload the release ZIP | Account, subject to settings |
+| Codex CLI / local app | Skills CLI or manual skill folder | Project or personal |
+| Ollama | Local Modelfile with AIOPS as the system prompt | Named local model configuration |
+| Grok | Paste the protocol in chat, or load it as API system instructions | Conversation or application |
 
-Requires Node.js 22.20 or later and access to GitHub. Run from the project where you want the skill:
+Read the [Limited Use License](LICENSE) before use. Keep the license with private copies. These instructions do not grant permission to publicly redistribute AIOPS or publish a model package containing it.
 
-```bash
-npx skills add heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol --skill aiops
-```
+### Claude Code
 
-The installer lets you choose a supported agent. Installation is project-scoped by default; use `-g` only if you want it available across projects.
-
-For Claude Code without interactive agent selection:
+With Node.js 22.20 or later installed, run from your project:
 
 ```bash
 npx skills add heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol --skill aiops --agent claude-code
 ```
 
-The project-scoped Claude Code installation was tested on 5 November 2026 using the Skills CLI. The installed skill file matched the published source. Other agent targets have not been tested for this release.
+For manual installation, download and extract the [v1.0.1 release ZIP](https://github.com/heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol/releases/tag/v1.0.1). Copy the entire extracted `aiops` folder, including `LICENSE`, to one location:
 
-### Claude web or desktop: upload the ZIP
+- Project: `.claude/skills/aiops/`
+- Personal, across local projects: `~/.claude/skills/aiops/`
 
-1. Open [release v1.0.1](https://github.com/heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol/releases/tag/v1.0.1) and download **aiops.zip** from Assets.
-2. In Claude, open **Customize → Skills**, choose **+ → Create skill → Upload a skill**, and upload the ZIP.
-3. Enable the skill. Availability depends on your account and organization settings.
+Do not overwrite an existing installation without reviewing it. Start a new session and invoke `/aiops` with your task. Local folder installation does not by itself install a skill into your Claude web account or Cowork.
 
-The ZIP contains `aiops/SKILL.md` and `aiops/LICENSE`. Use this asset rather than GitHub's automatically generated source-code archives.
+### Claude web and desktop
 
-### Other tools: manual installation
+1. Download **aiops.zip** from the [v1.0.1 release](https://github.com/heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol/releases/tag/v1.0.1).
+2. Open **Customize → Skills**, choose **+ → Create skill → Upload a skill**, and upload the ZIP.
+3. Enable AIOPS, then start a conversation and ask it to apply AIOPS before your task.
 
-Copy the entire `aiops` folder into your tool's documented skills directory. Consult that tool's instructions; paths and activation behavior vary.
+The ZIP contains `aiops/SKILL.md` and `aiops/LICENSE`. Use this asset rather than GitHub's automatic source-code ZIP. Skill availability depends on account capabilities and organization policy.
 
-### Verify activation
+### Codex CLI and local app
 
-Start a fresh conversation or session if your host requires it, then ask:
+With Node.js 22.20 or later installed, run from your project:
+
+```bash
+npx skills add heshamhammam1/AIOPS-AI-Orchestration-Optimization-Protocol --skill aiops --agent codex
+```
+
+Alternatively, extract the release ZIP and copy its complete `aiops` folder to:
+
+- Project: `.agents/skills/aiops/`
+- Personal, across local projects: `~/.agents/skills/aiops/`
+
+Start a fresh Codex session, select the skill if your interface provides a skill picker, or explicitly ask: “Use the aiops skill before this task.”
+
+These are local filesystem instructions. Managed ChatGPT Work or cloud environments can have separate installation and sharing flows; copying a folder on your computer does not automatically install it there.
+
+### Ollama: local system-prompt configuration
+
+This route loads AIOPS as instructions; it does not install a native skill loader or add tools, connectors, or approval enforcement.
+
+Prerequisites: Ollama running locally, Python 3, and a base model already installed. Run `ollama list` and choose an exact model name you have available.
+
+Extract the release ZIP. In the directory containing the extracted `aiops` folder, run the following Python code, replacing `YOUR_INSTALLED_MODEL` with that model name:
+
+```python
+from pathlib import Path
+
+base_model = "YOUR_INSTALLED_MODEL"
+skill = Path("aiops/SKILL.md").read_text(encoding="utf-8")
+body = skill.split("---", 2)[2].strip()
+if '"""' in body:
+    raise ValueError("Review triple-quote escaping before generating the Modelfile.")
+Path("Modelfile.aiops").write_text(
+    f'FROM {base_model}\nSYSTEM """\n{body}\n"""\n',
+    encoding="utf-8",
+)
+```
+
+Then run:
+
+```bash
+ollama create aiops-local -f Modelfile.aiops
+ollama run aiops-local
+```
+
+Ask it to apply AIOPS and wait for approval before your task. Keep the license alongside your local configuration. This creates a local configuration; it does not train a model. Do not publicly push or redistribute the configuration containing AIOPS without permission. Instruction following depends on the model and context capacity.
+
+### Grok: conversation or API instructions
+
+**Grok chat:** open `aiops/SKILL.md`, copy the protocol from the heading onward (omit the YAML block between the opening `---` delimiters), and paste it into a new conversation. Add:
+
+> Treat the preceding AIOPS protocol as instructions for this conversation, subject to your platform rules. Before my next task, present an AIOPS recommendation and wait for explicit approval. Do not assume access to tools you do not have.
+
+Then send your task. Re-supply the protocol in a new conversation; do not assume it persists across chats. This is prompt-based use, not a verified native Grok skill installation.
+
+**Grok API applications:** read the protocol body from the local file and include it as a `system` message in the application's xAI Responses API input:
+
+```python
+from pathlib import Path
+
+protocol = Path("aiops/SKILL.md").read_text(encoding="utf-8")
+protocol = protocol.split("---", 2)[2].strip()
+input_messages = [
+    {"role": "system", "content": protocol},
+    {"role": "user", "content": "Review my requirement. Recommend a plan first."},
+]
+# Supply input_messages as input to your configured xAI Responses API call.
+```
+
+This snippet prepares messages; it does not make an API call. Configure authentication securely outside chat and choose a model available to your account. Maintain these instructions in the application's conversation handling. Enforce consequential approvals in application code if required; a system prompt alone is not a permission boundary.
+
+### Verify activation on any platform
+
+Ask:
 
 > Apply AIOPS. I want you to review a product requirement. First recommend the model, tools, scope, risks, and validation plan. Wait for my approval before doing the review.
 
-Expected behavior: the assistant presents an AIOPS recommendation and asks for approval before substantive work. This is a user-run behavioral check; the installation test did not establish compliance across models or hosts.
+Expected behavior: a recommendation and approval request before substantive work. Check that it does not invent tool access or claim to switch models automatically.
 
-### Versions and updates
+### Validation and updates
 
-Use the versioned ZIP when you need the exact v1.0.1 package. The repository install command follows the repository's current source. Review changes before updating. Installation never grants approval for future tasks.
+The Claude Code CLI installation was tested on 5 November 2026 and its installed `SKILL.md` matched the published source. Codex, Ollama, Grok, and Claude ZIP-upload steps are documentation-backed instructions, not end-to-end tests performed for this repository. No paid API requests were made.
+
+Use the versioned ZIP for the exact v1.0.1 package. CLI installation follows current repository source. Review updates before installing; installation does not approve future tasks.
+
+### Official platform references
+
+- [Claude Code skills](https://code.claude.com/docs/en/skills)
+- [Claude skill uploads](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+- [OpenAI: build skills and Codex locations](https://learn.chatgpt.com/docs/build-skills)
+- [Ollama Modelfile reference](https://docs.ollama.com/modelfile)
+- [xAI text generation and system messages](https://docs.x.ai/developers/model-capabilities/text/generate-text)
+- [Vercel Skills CLI](https://github.com/vercel-labs/skills)
 
 ## Get started
 
